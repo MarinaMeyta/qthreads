@@ -3,13 +3,21 @@
 
 #include <QDebug>
 #include <QThread>
-//#include <QCoreApplication>
+#include <QTimer>
 
 Controller::Controller()
 {
     // first thread
     Worker* workerFirst = new Worker();
     workerFirst->moveToThread(&workerFirstThread);
+
+    // setting timer for first thread
+    QTimer* timer = new QTimer(0);
+    timer->setInterval(100);
+    timer->moveToThread(&workerFirstThread);
+
+    // make sure that timer starts with thread
+    connect(&workerFirstThread, SIGNAL(started()), timer, SLOT(start()));
     connect(&workerFirstThread, SIGNAL(started()), workerFirst, SLOT(run()));
     connect(&workerFirstThread, SIGNAL(finished()), workerFirst, SLOT(deleteLater()));
 
@@ -18,6 +26,7 @@ Controller::Controller()
     {
        qDebug() << "Started 1st thread...\n";
     }
+
 
     //second thread
     Worker* workerSecond = new Worker();
