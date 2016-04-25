@@ -8,15 +8,13 @@
 class Controller : public QObject
 {
     Q_OBJECT
-    QThread workerFirstThread;
-    QThread workerSecondThread;
 
 public:
     Controller();
     ~Controller();
 
 public slots:
-    void some_function();
+    void start_threads();
 
 signals:
     void quit();

@@ -4,61 +4,38 @@
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
+#include <QVector>
 
-Controller::Controller()
-{
-    // first thread
-    Worker* workerFirst = new Worker();
-    workerFirst->moveToThread(&workerFirstThread);
+Controller::Controller() {}
 
-    // setting timer for first thread
-    QTimer* timer = new QTimer(0);
-    timer->setInterval(100);
-    timer->moveToThread(&workerFirstThread);
+Controller::~Controller() {}
 
-    // make sure that timer starts with thread
-    connect(&workerFirstThread, SIGNAL(started()), timer, SLOT(start()));
-    connect(&workerFirstThread, SIGNAL(started()), workerFirst, SLOT(run()));
-    connect(&workerFirstThread, SIGNAL(finished()), workerFirst, SLOT(deleteLater()));
+void Controller::start_threads() {
 
-    workerFirstThread.start();
-    if (workerFirstThread.isRunning())
+    // n = tasks.size()
+    int n = 3;
+
+    QVector<QThread*> threads(n);
+    for (int i = 0; i < n; i++)
     {
-       qDebug() << "Started 1st thread...\n";
+        QThread* thread = new QThread();
+        Worker* worker = new Worker();
+        worker->moveToThread(thread);
+        connect(thread, SIGNAL(started()), worker, SLOT(run()));
+        connect(thread, SIGNAL(finished()), worker, SLOT(deleteLater()));
+        threads[i] = thread;
     }
 
-
-    //second thread
-    Worker* workerSecond = new Worker();
-    workerSecond->moveToThread(&workerSecondThread);
-    connect(&workerSecondThread, SIGNAL(started()), workerSecond, SLOT(run()));
-    connect(&workerSecondThread, SIGNAL(finished()), workerSecond, SLOT(deleteLater()));
-
-    workerSecondThread.start();
-    if (workerSecondThread.isRunning())
+    for (int i = 0; i < threads.capacity(); i++)
     {
-       qDebug() << "Started 2st thread...\n";
+        qDebug() << "Starting " << i << " thread...\n";
+        threads[i]->start();
     }
 
-}
-
-Controller::~Controller()
-{
-    workerFirstThread.quit();
-    workerFirstThread.wait();
-    qDebug() << "Finishing 1st thread...\n";
-
-    workerSecondThread.quit();
-    workerSecondThread.wait();
-    qDebug() << "Finishing 2nd thread...\n";
-
-    some_function();
-
-    emit QCoreApplication::quit();
+    threads.clear();
+    emit quit();
     qDebug() << "Quitting...";
 }
 
-void Controller::some_function() {
-    qDebug() << "Executing some function...";
-}
+
 

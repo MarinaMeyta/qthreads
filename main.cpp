@@ -12,6 +12,9 @@
 
 #include <QtGlobal>
 
+
+
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -19,7 +22,8 @@ int main(int argc, char *argv[])
 //    qDebug() << "QVersion: " << qVersion();
 
     qDebug() << "Starting executing...\n";
-    Controller();
-
+    Controller c;
+    c.start_threads();
+//    QObject::connect(&c, SIGNAL(quit()), &app, SLOT(QCoreApplication::exit()));
     return app.exec();
 }
