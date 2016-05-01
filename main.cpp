@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
 
     QObject::connect(c, SIGNAL(finished()), &app, SLOT(quit()));
     c->start_threads();
-//    c->stop_threads();
 
     return app.exec();
 }

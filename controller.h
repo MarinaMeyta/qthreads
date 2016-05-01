@@ -19,9 +19,9 @@ public:
     ~Controller();
 
     void add_task(Worker* task);
+    void start_threads();
 
 public slots:
-    void start_threads();
     void stop_threads();
 
 signals:

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 
-class Worker : public QThread
+class Worker : public QObject
 {
     Q_OBJECT
 

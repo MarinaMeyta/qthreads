@@ -23,9 +23,10 @@ void Controller::add_task(Worker *task)
     task->moveToThread(thread);
     connect(thread, SIGNAL(started()), task, SLOT(run()));
     connect(task, SIGNAL(finished()), thread, SLOT(quit()));
-
     connect(task, SIGNAL(finished()), task, SLOT(deleteLater()));
-    connect(task, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(destroyed()), this, SLOT(stop_threads()));
+
     threads.push_back(thread);
 }
 
@@ -34,36 +35,20 @@ void Controller::start_threads()
     foreach (QThread* t, threads)
     {
        t->start();
+       qDebug() << "thread started\n";
     }
 }
 
 //slot for finishing threads
 void Controller::stop_threads()
 {
-    bool all_finished = false;
+    ++threads_counter;
 
-    while(all_finished != true)
+    if (threads_counter == threads.count())
     {
-        foreach (QThread* t, threads)
-        {
-           if (t->isRunning())
-           {
-//               threads_counter++;
-//               qDebug() << "threads_counter++\n";
-               qDebug() << "thread is still running\n";
-           }
-           else {qDebug() << "finished\n";}
-        }
-
-//        if (threads_counter == threads.capacity())
-//        {
-//            all_finished = true;
-//            qDebug() << "all finished = true\n";
-//        }
+        emit finished();
+        qDebug() << "threads are finished\n";
     }
-
-//    emit finished();
-//    qDebug() << "threads are finished\n";
 }
 
 

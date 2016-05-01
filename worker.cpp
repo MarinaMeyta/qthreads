@@ -16,8 +16,8 @@ void Worker::run()
     for (int i = 0; i < 5; i++)
     {
         qDebug() << "message: " << mes;
-        sleep(2);
+//        sleep(2);
     }
     emit finished();
-    qDebug() << "finished\n";
+    qDebug() << "finished work\n";
 }
