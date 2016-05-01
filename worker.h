@@ -2,20 +2,25 @@
 #define CHILD_OBJECT_H
 
 #include <QObject>
+#include <QThread>
 
-class Worker : public QObject
+class Worker : public QThread
 {
     Q_OBJECT
 
 public:
     Worker();
     ~Worker();
+    void set_message(const QString &message);
 
 signals:
     void finished();
 
 public slots:
     void run();
+
+private:
+    QString mes;
 };
 
 #endif // CHILD_OBJECT_H

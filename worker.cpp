@@ -2,16 +2,22 @@
 
 #include <QDebug>
 #include <QThread>
-Worker::Worker() {}
+Worker::Worker(): mes("") {}
 
 Worker::~Worker() {}
+
+void Worker::set_message(const QString &message)
+{
+    this->mes = message;
+}
 
 void Worker::run()
 {
     for (int i = 0; i < 5; i++)
     {
-       qDebug() << "message " << (i + 1);
-//       QThread::usleep(1000);
+        qDebug() << "message: " << mes;
+        sleep(2);
     }
     emit finished();
+    qDebug() << "finished\n";
 }

@@ -6,35 +6,64 @@
 #include <QTimer>
 #include <QVector>
 
-Controller::Controller() {}
+Controller::Controller()
+{
+    threads_counter = 0;
+}
 
-Controller::~Controller() {}
+Controller::~Controller()
+{
+    qDebug() << "Controller object was destroyed\n";
+}
 
-void Controller::start_threads() {
+void Controller::add_task(Worker *task)
+{
+    task->setParent(NULL);
+    QThread* thread = new QThread();
+    task->moveToThread(thread);
+    connect(thread, SIGNAL(started()), task, SLOT(run()));
+    connect(task, SIGNAL(finished()), thread, SLOT(quit()));
 
-    // n = tasks.size()
-    int n = 3;
+    connect(task, SIGNAL(finished()), task, SLOT(deleteLater()));
+    connect(task, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    threads.push_back(thread);
+}
 
-    QVector<QThread*> threads(n);
-    for (int i = 0; i < n; i++)
+void Controller::start_threads()
+{
+    foreach (QThread* t, threads)
     {
-        QThread* thread = new QThread();
-        Worker* worker = new Worker();
-        worker->moveToThread(thread);
-        connect(thread, SIGNAL(started()), worker, SLOT(run()));
-        connect(thread, SIGNAL(finished()), worker, SLOT(deleteLater()));
-        threads[i] = thread;
+       t->start();
+    }
+}
+
+//slot for finishing threads
+void Controller::stop_threads()
+{
+    bool all_finished = false;
+
+    while(all_finished != true)
+    {
+        foreach (QThread* t, threads)
+        {
+           if (t->isRunning())
+           {
+//               threads_counter++;
+//               qDebug() << "threads_counter++\n";
+               qDebug() << "thread is still running\n";
+           }
+           else {qDebug() << "finished\n";}
+        }
+
+//        if (threads_counter == threads.capacity())
+//        {
+//            all_finished = true;
+//            qDebug() << "all finished = true\n";
+//        }
     }
 
-    for (int i = 0; i < threads.capacity(); i++)
-    {
-        qDebug() << "Starting " << i << " thread...\n";
-        threads[i]->start();
-    }
-
-    threads.clear();
-    emit quit();
-    qDebug() << "Quitting...";
+//    emit finished();
+//    qDebug() << "threads are finished\n";
 }
 
 

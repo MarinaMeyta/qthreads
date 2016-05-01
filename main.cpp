@@ -12,9 +12,6 @@
 
 #include <QtGlobal>
 
-
-
-
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -22,8 +19,25 @@ int main(int argc, char *argv[])
 //    qDebug() << "QVersion: " << qVersion();
 
     qDebug() << "Starting executing...\n";
-    Controller c;
-    c.start_threads();
-//    QObject::connect(&c, SIGNAL(quit()), &app, SLOT(QCoreApplication::exit()));
+    // n = tasks.size()
+
+    Worker* a = new Worker();
+    a->set_message("aaaaaaa");
+
+    Worker* b = new Worker();
+    b->set_message("bbbbbbb");
+
+    Worker* d = new Worker();
+    d->set_message("ddddddd");
+
+    Controller* c = new Controller();
+    c->add_task(a);
+    c->add_task(b);
+    c->add_task(d);
+
+    QObject::connect(c, SIGNAL(finished()), &app, SLOT(quit()));
+    c->start_threads();
+//    c->stop_threads();
+
     return app.exec();
 }
